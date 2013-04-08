@@ -41,6 +41,7 @@ class AuthenticationController < ApplicationController
 
     if @user.valid?
       @user.save
+      UserMailer.welcome_email(@user).deliver
       session[:user_id] = @user.id
       flash[:notice] = 'Welcome.'
       redirect_to :root
@@ -61,7 +62,7 @@ class AuthenticationController < ApplicationController
 
     # verify
     if @user.nil?
-      @user = current_user
+      @user = old_user
       @user.errors[:password] = "Password is incorrect."
       render :action => "account_settings"
     else
