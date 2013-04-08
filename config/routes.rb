@@ -1,4 +1,18 @@
 BasicAuth::Application.routes.draw do
+  root :to=>"home#index"
+  get "signed_out" => "authentication#signed_out"
+  get "forgot_password" => "authentication#forgot_password"
+  get "password_sent" => "authentication#password_sent"
+
+  get "sign_in" => "authentication#sign_in"
+  post "sign_in" => "authentication#login"
+
+  get "new_user" => "authentication#new_user"
+  post "new_user" => "authentication#register"
+
+  get "account_settings" => "authentication#account_settings"
+  put "account_settings" => "authentication#set_account_info"
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

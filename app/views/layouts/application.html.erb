@@ -8,6 +8,21 @@
 </head>
 <body>
 
+<p>
+<% if current_user %>
+    Logged in as <%= current_user.username %>.
+    <%= link_to "Sign Out", signed_out_path %>
+    <%= link_to "Account Settings", account_settings_path %>
+<% else %>
+    <%= link_to "Sign up", new_user_path %> or
+    <%= link_to "Sign In", sign_in_path %>
+<% end %>
+</p>
+
+<% flash.each do |name, msg| %>
+    <%= content_tag :div, msg, :id => "flash_#{name}" %>
+<% end %>
+
 <%= yield %>
 
 </body>

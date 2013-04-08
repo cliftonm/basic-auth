@@ -1,0 +1,15 @@
+<p>Sign In</p>
+<%= form_for @user, :as => :user, :url => sign_in_path do |f| %>
+    <p>
+      <%= f.label 'username or email:' %><br/>
+      <%= f.text_field :username %>
+    </p>
+    <p>
+      <%= f.label 'password:' %><br/>
+      <%= f.password_field :password %>
+    </p>
+    <p>
+      <%= f.submit 'Sign In' %>&nbsp;&nbsp;&nbsp;
+      <%= f.submit 'Clear Form', :type => 'reset' %>
+    </p>
+<% end %>

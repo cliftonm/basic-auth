@@ -1,0 +1,27 @@
+<p>Sign Up</p>
+<%= form_for @user, :as => :user, :url => new_user_path do |f| %>
+    <p>
+      <%= f.label 'username:' %><br/>
+      <%= f.text_field :username %>
+      <%= show_field_error(@user, :username) %>
+    </p>
+    <p>
+      <%= f.label 'email:' %><br/>
+      <%= f.text_field :email %>
+      <%= show_field_error(@user, :email) %>
+    </p>
+    <p>
+      <%= f.label 'password:' %><br/>
+      <%= f.password_field :password %>
+      <%= show_field_error(@user, :password) %>
+    </p>
+    <p>
+      <%= f.label 'password confirmation:' %><br/>
+      <%= f.password_field :password_confirmation %>
+      <%= show_field_error(@user, :password_confirmation) %>
+    </p>
+    <p>
+      <%= f.submit 'Sign Up' %>&nbsp;&nbsp;&nbsp;
+      <%= f.submit 'Clear Form', :type => 'reset' %>
+    </p>
+<% end %>
