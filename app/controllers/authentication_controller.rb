@@ -1,4 +1,6 @@
 class AuthenticationController < ApplicationController
+  before_filter :authenticate_user, :only => [:account_settings, :set_account_info]
+
   def sign_in
     @user = User.new
   end
@@ -10,6 +12,8 @@ class AuthenticationController < ApplicationController
     user = verify_user(username_or_email)
 
     if user
+      update_authentication_token(user, params[:user][:remember_me])
+      user.save
       session[:user_id] = user.id
       flash[:notice] = 'Welcome.'
       redirect_to :root
@@ -17,15 +21,22 @@ class AuthenticationController < ApplicationController
       flash.now[:error] = 'Unknown user.  Please check your username and password.'
       render :action => "sign_in"
     end
-
   end
 
   # ========= Signing Out ==========
 
   def signed_out
-    session[:user_id] = nil
-    flash[:notice] = "You have been signed out."
-    redirect_to :root
+    # clear the authentication toke when the user manually signs out
+    user = User.find_by_id(session[:user_id])
+
+    if user
+      update_authentication_token(user, nil)
+      user.save
+      session[:user_id] = nil
+      flash[:notice] = "You have been signed out."
+    else
+      redirect_to :sign_in
+    end
   end
 
   # ========= Handles Registering a New User ==========
@@ -37,13 +48,22 @@ class AuthenticationController < ApplicationController
   def register
     @user = User.new(params[:user])
 
-    if @user.valid?
-      @user.save
-      UserMailer.welcome_email(@user).deliver
-      session[:user_id] = @user.id
-      flash[:notice] = 'Welcome.'
-      redirect_to :root
+    # Don't use !verify_recaptcha, as this terminates the connection with the server.
+    # It almost seems as if the verify_recaptcha is being called twice with we use "not".
+    if verify_recaptcha
+      if @user.valid?
+        update_authentication_token(@user, nil)
+        @user.save
+        UserMailer.welcome_email(@user).deliver
+        session[:user_id] = @user.id
+        flash[:notice] = 'Welcome.'
+        redirect_to :root
+      else
+        render :action => "new_user"
+      end
     else
+      flash.delete(:recaptcha_error)  # get rid of the recaptcha error being flashed by the gem.
+      flash.now[:error] = 'reCAPTCHA is incorrect.  Please try again.'
       render :action => "new_user"
     end
   end
@@ -192,5 +212,18 @@ class AuthenticationController < ApplicationController
     end
 
     user
+  end
+
+  def update_authentication_token(user, remember_me)
+    if remember_me == 1
+      # create an authentication token if the user has clicked on remember me
+      auth_token = SecureRandom.urlsafe_base64
+      user.authentication_token = auth_token
+      cookies.permanent[:auth_token] = auth_token
+    else              # nil or 0
+      # if not, clear the token, as the user doesn't want to be remembered.
+      user.authentication_token = nil
+      cookies.permanent[:auth_token] = nil
+    end
   end
 end

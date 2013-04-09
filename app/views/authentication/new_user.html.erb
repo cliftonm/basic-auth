@@ -21,6 +21,13 @@
       <%= show_field_error(@user, :password_confirmation) %>
     </p>
     <p>
+      <%= f.check_box :remember_me %>
+      <%= f.label 'remember me' %>
+    </p>
+    <p>
+      <%= recaptcha_tags %>
+    </p>
+    <p>
       <%= f.submit 'Sign Up' %>&nbsp;&nbsp;&nbsp;
       <%= f.submit 'Clear Form', :type => 'reset' %>
     </p>
