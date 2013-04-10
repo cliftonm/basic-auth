@@ -18,6 +18,9 @@ BasicAuth::Application.routes.draw do
   get "password_reset" => "authentication#password_reset"
   put "password_reset" => "authentication#new_password"
 
+  get "admin_users" => "admin#users"
+  delete "user/:id" => "admin#delete_user", :as => "user"
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
